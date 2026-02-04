@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from zoneinfo import ZoneInfo
 import os
 
 # ---------------- CONFIG ----------------
@@ -102,11 +103,13 @@ def formato_porcentaje(v):
     return f"{str(v).replace('.', ',')}%"
 
 def fecha():
+    tz = ZoneInfo("America/Bogota")
+    f = datetime.now(tz)
+
     dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
     meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
              "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
-    f = datetime.now()
     hora = f.strftime("%I:%M").lstrip("0")
     ampm = "a. m." if f.hour < 12 else "p. m."
 
