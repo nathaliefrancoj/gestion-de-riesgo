@@ -28,7 +28,7 @@ th, td {
 }
 
 .header-row th {
-    background-color: #fff4cc;
+    background-color: #ffe599;
     text-align: center;
 }
 
@@ -50,12 +50,12 @@ th, td {
 }
 
 .text-retorno-win {
-    color: #2e7d32;
+    color: #93c47d;
     font-weight: bold;
 }
 
 .text-retorno-loss {
-    color: #c62828;
+    color: #e06666;
     font-weight: bold;
 }
 
@@ -304,6 +304,7 @@ if st.session_state.hist:
 else:
 
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
+
 
 
 
