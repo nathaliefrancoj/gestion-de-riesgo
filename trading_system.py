@@ -219,7 +219,7 @@ if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
 
 # ---------------- BOTONES ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
-c1, c2 = st.columns([1,1,10])
+c1, c2, _ = st.columns([1,1,10])
 win = c1.button("Win")
 loss = c2.button("Loss")
 st.markdown("</div>", unsafe_allow_html=True)
