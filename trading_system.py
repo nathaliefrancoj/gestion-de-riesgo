@@ -139,6 +139,14 @@ if "init" not in st.session_state:
         "contador": 0
     })
 
+# Garantiza que las claves críticas siempre existan
+st.session_state.setdefault("en_recuperacion", False)
+st.session_state.setdefault("capital_freeze", None)
+st.session_state.setdefault("loss_trade", 0)
+st.session_state.setdefault("loss_consec", 0)
+st.session_state.setdefault("wins_rec", 0)
+st.session_state.setdefault("capital", 0)
+
 # Cargar histórico guardado
 if os.path.exists(HIST_FILE) and not st.session_state.hist:
     df = pd.read_csv(HIST_FILE)
