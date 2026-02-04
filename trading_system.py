@@ -33,15 +33,15 @@ th, td {
 }
 
 .text-win {
-    background-color: #d4edda;
+    background-color: #2e7d32;
     color: #000000;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 .text-loss {
-    background-color: #f8d7da;
+    background-color: #c62828;
     color: #000000;
-    font-weight: normal;
+    font-weight: bold;
 }
 
 .text-win,
@@ -304,6 +304,7 @@ if st.session_state.hist:
 else:
 
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
+
 
 
 
