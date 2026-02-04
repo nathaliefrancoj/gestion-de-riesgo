@@ -205,7 +205,6 @@ if win:
     st.session_state.contador += 1
     st.session_state.hist.insert(0, {
         "N°": st.session_state.contador,
-        "Fecha": fecha(),
         "Nivel": nivel,
         "Resultado": "Win",
         "Inversión": formato_numero(monto),
@@ -231,7 +230,6 @@ if loss:
     st.session_state.contador += 1
     st.session_state.hist.insert(0, {
         "N°": st.session_state.contador,
-        "Fecha": fecha(),
         "Nivel": nivel,
         "Resultado": "Loss",
         "Inversión": formato_numero(monto),
@@ -282,4 +280,5 @@ if st.session_state.hist:
     html += "</tbody></table>"
     st.markdown(html, unsafe_allow_html=True)
 else:
+
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
