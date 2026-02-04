@@ -222,11 +222,34 @@ porc = PORCENTAJES[nivel][st.session_state.loss_trade]
 monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
+# Previsualización de pérdida
+loss_preview = ""
+if st.session_state.loss_trade + 1 < len(PORCENTAJES[nivel]):
+    next_porc = PORCENTAJES[nivel][st.session_state.loss_trade + 1]
+    next_monto = base * next_porc / 100
+    loss_preview = f"""
+    &nbsp;|&nbsp;
+    <span class='text-loss'><b>Loss → {formato_numero(next_monto)}</b></span>
+    """
+
 # ---------------- INFO ----------------
+loss_preview = ""
+if st.session_state.loss_trade + 1 < len(PORCENTAJES[nivel]):
+    next_porc = PORCENTAJES[nivel][st.session_state.loss_trade + 1]
+    next_monto = base * next_porc / 100
+    loss_preview = f"""
+    &nbsp;|&nbsp;
+    <span class='text-loss'><b>Loss → {formato_numero(next_monto)}</b></span>
+    """
+
 st.markdown(f"""
 <div class='info'><b>Capital inicial:</b> {formato_numero(st.session_state.capital_ini)}</div>
 <div class='info'><b>Saldo actual:</b> {formato_numero(st.session_state.capital)}</div>
-<div class='info'><b>Próxima inversión:</b> {formato_porcentaje(porc)} → {formato_numero(monto)}</div>
+<div class='info'>
+<b>Próxima inversión:</b>
+<span class='text-win'><b>Win → {formato_numero(monto)}</b></span>
+{loss_preview}
+</div>
 <div class='info'><b>Nivel:</b> {nivel}</div>
 """, unsafe_allow_html=True)
 
