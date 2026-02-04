@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+import os
 
 # ---------------- CONFIG ----------------
 st.set_page_config(page_title="Sistema de Gestión de Inversión", layout="wide")
@@ -36,6 +37,26 @@ th, td {
 .text-loss { color: #c62828; font-weight: bold; }
 
 .bold { font-weight: bold; }
+
+/* -------- SCROLL HORIZONTAL MÓVIL -------- */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+td, th, .info {
+    white-space: nowrap;
+}
+
+.stButton {
+    display: inline-block;
+    margin-right: 6px;
+}
+
+[data-testid="column"] {
+    min-width: fit-content;
+}
 
 /* -------- BOTONES UNIFICADOS -------- */
 .stButton > button {
@@ -106,10 +127,19 @@ def formato_porcentaje(v):
     return f"{str(v).replace('.', ',')}%"
 
 def fecha():
-    meses = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
-             "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"]
+    dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+             "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+
     f = datetime.now()
-    return f"{meses[f.month-1]} {f.day} de {f.year} - {f.strftime('%I:%M %p').lower()}"
+
+    dia_semana = dias[f.weekday()]
+    mes = meses[f.month - 1]
+
+    hora = f.strftime("%I:%M").lstrip("0")
+    ampm = "a. m." if f.hour < 12 else "p. m."
+
+    return f"{dia_semana}, {f.day} de {mes} - {hora} {ampm}"
 
 # ---------------- CONFIG SISTEMA ----------------
 PORCENTAJES = {
@@ -120,6 +150,26 @@ PORCENTAJES = {
 }
 
 PAGO_BROKER = 0.89
+HIST_FILE = "historial.csv"
+
+if "init" not in st.session_state:
+    st.session_state.update({
+        "init": False,
+        "capital": 0,
+        "capital_ini": 0,
+        "loss_trade": 0,
+        "loss_consec": 0,
+        "wins_rec": 0,
+        "en_recuperacion": False,
+        "capital_freeze": None,
+        "hist": [],
+        "contador": 0
+    })
+
+if os.path.exists(HIST_FILE) and not st.session_state.hist:
+    df = pd.read_csv(HIST_FILE)
+    st.session_state.hist = df.to_dict("records")
+    st.session_state.contador = len(st.session_state.hist)
 
 OBJETIVOS_REC = {
     2: 5,
@@ -212,8 +262,9 @@ if win:
         "Retorno": f"<span class='text-win'>{formato_numero(retorno)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
     })
+    pd.DataFrame(st.session_state.hist).to_csv(HIST_FILE, index=False)
     st.rerun()
-
+    
 # ---------------- LOSS ----------------
 if loss:
     if not st.session_state.en_recuperacion:
@@ -238,6 +289,7 @@ if loss:
         "Retorno": f"<span class='text-loss'>-{formato_numero(monto)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
     })
+    pd.DataFrame(st.session_state.hist).to_csv(HIST_FILE, index=False)
     st.rerun()
 
 # ---------------- HISTORICO + BORRAR ----------------
@@ -246,6 +298,9 @@ h1.subheader("Histórico")
 
 if h2.button("Borrar"):
     cap = st.session_state.capital_ini
+    
+    if os.path.exists(HIST_FILE):
+    os.remove(HIST_FILE)
     st.session_state.clear()
     st.session_state.update({
     "init": True,
@@ -280,6 +335,6 @@ if st.session_state.hist:
                 html += f"<td>{v}</td>"
         html += "</tr>"
     html += "</tbody></table>"
-    st.markdown(html, unsafe_allow_html=True)
+    st.markdown(f"<div class='table-container'>{html}</div>", unsafe_allow_html=True)
 else:
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
