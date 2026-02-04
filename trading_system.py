@@ -205,8 +205,6 @@ if win:
     st.session_state.contador += 1
     st.session_state.hist.insert(0, {
         "N°": st.session_state.contador,
-        "Fecha": fecha(),
-        "Nivel": nivel,
         "Resultado": "Win",
         "Inversión": formato_numero(monto),
         "Retorno": f"<span class='text-win'>{formato_numero(retorno)}</span>",
@@ -231,8 +229,6 @@ if loss:
     st.session_state.contador += 1
     st.session_state.hist.insert(0, {
         "N°": st.session_state.contador,
-        "Fecha": fecha(),
-        "Nivel": nivel,
         "Resultado": "Loss",
         "Inversión": formato_numero(monto),
         "Retorno": f"<span class='text-loss'>-{formato_numero(monto)}</span>",
