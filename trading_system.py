@@ -205,8 +205,8 @@ if win:
     st.session_state.contador += 1
     st.session_state.hist.insert(0, {
         "N°": st.session_state.contador,
-        "Nivel": nivel,
         "Resultado": "Win",
+        "Nivel": nivel,
         "Inversión": formato_numero(monto),
         "Retorno": f"<span class='text-win'>{formato_numero(retorno)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
@@ -230,8 +230,8 @@ if loss:
     st.session_state.contador += 1
     st.session_state.hist.insert(0, {
         "N°": st.session_state.contador,
-        "Nivel": nivel,
         "Resultado": "Loss",
+        "Nivel": nivel,
         "Inversión": formato_numero(monto),
         "Retorno": f"<span class='text-loss'>-{formato_numero(monto)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
@@ -282,3 +282,4 @@ if st.session_state.hist:
 else:
 
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
+
