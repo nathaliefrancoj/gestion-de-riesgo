@@ -189,11 +189,25 @@ porc = PORCENTAJES[nivel][st.session_state.loss_trade]
 monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
+# ---------------- ESTADO DEL TRADE (OTM / ITM) ----------------
+estado_trade = ""
+otm_restantes = 3 - st.session_state.loss_trade
+
+if st.session_state.loss_trade == 0:
+    estado_trade = "Te quedan 3 OTM"
+elif st.session_state.loss_trade == 1:
+    estado_trade = "Te quedan 2 OTM"
+elif st.session_state.loss_trade == 2:
+    estado_trade = "Te queda 1 OTM"
+elif st.session_state.loss_trade >= 3:
+    estado_trade = "Ha perdido"
+
 # ---------------- INFO ----------------
 st.markdown(f"""
 <div class='info'><b>Capital inicial:</b> {formato_numero(st.session_state.capital_ini)}</div>
 <div class='info'><b>Saldo actual:</b> {formato_numero(st.session_state.capital)}</div>
 <div class='info'><b>Próxima inversión:</b> {formato_porcentaje(porc)} → {formato_numero(monto)}</div>
+<div class='info'><b>{estado_trade}</b></div>
 <div class='info'><b>Nivel:</b> {nivel}</div>
 """, unsafe_allow_html=True)
 
@@ -210,6 +224,7 @@ loss = c2.button("Loss")
 
 # ---------------- WIN ----------------
 if win:
+    estado_trade = "Ha ganado"
     st.session_state.capital += retorno
     st.session_state.loss_trade = 0
 
@@ -299,6 +314,7 @@ if st.session_state.hist:
 else:
 
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
+
 
 
 
