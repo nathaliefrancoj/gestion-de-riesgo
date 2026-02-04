@@ -44,11 +44,6 @@ th, td {
     font-weight: bold;
 }
 
-.text-win,
-.text-loss {
-    border-radius: 6px;
-}
-
 .text-retorno-win {
     color: #93c47d;
     font-weight: bold;
@@ -304,6 +299,7 @@ if st.session_state.hist:
 else:
 
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
+
 
 
 
