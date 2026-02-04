@@ -149,7 +149,26 @@ PORCENTAJES = {
 
 OBJETIVOS_REC = {2: 5, 3: 9, 4: 13}
 PAGO_BROKER = 0.89
-HIST_FILE = "historial.csv"
+
+# ---------------- USUARIO ----------------
+if "usuario" not in st.session_state:
+    st.session_state.usuario = ""
+
+if not st.session_state.usuario:
+    st.title("Sistema de Gestión de Inversión")
+    usuario = st.text_input("Nombre de usuario")
+
+    if st.button("Entrar"):
+        if usuario.strip() == "":
+            st.warning("Ingresa un nombre de usuario")
+        else:
+            st.session_state.usuario = usuario.strip().lower().replace(" ", "_")
+            st.rerun()
+
+    st.stop()
+
+# ---------------- HISTORIAL POR USUARIO ----------------
+HIST_FILE = f"historial_{st.session_state.usuario}.csv"
 
 # ---------------- ESTADO ----------------
 if "init" not in st.session_state:
