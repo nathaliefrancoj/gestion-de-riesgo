@@ -28,31 +28,12 @@ th, td {
 }
 
 .header-row th {
-    background-color: #ffe599;
+    background-color: #fff4cc;
     text-align: center;
 }
 
-.text-win {
-    background-color: #93c47d;
-    color: #000000;
-    font-weight: bold;
-}
-
-.text-loss {
-    background-color: #e06666;
-    color: #000000;
-    font-weight: bold;
-}
-
-.text-retorno-win {
-    color: #2e7d32;
-    font-weight: bold;
-}
-
-.text-retorno-loss {
-    color: #e06666;
-    font-weight: bold;
-}
+.text-win { color: #2e7d32; font-weight: bold; }
+.text-loss { color: #c62828; font-weight: bold; }
 
 .bold { font-weight: bold; }
 
@@ -189,25 +170,11 @@ porc = PORCENTAJES[nivel][st.session_state.loss_trade]
 monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
-# ---------------- ESTADO DEL TRADE (OTM / ITM) ----------------
-estado_trade = ""
-otm_restantes = 3 - st.session_state.loss_trade
-
-if st.session_state.loss_trade == 0:
-    estado_trade = "Te quedan 3 OTM"
-elif st.session_state.loss_trade == 1:
-    estado_trade = "Te quedan 2 OTM"
-elif st.session_state.loss_trade == 2:
-    estado_trade = "Te queda 1 OTM"
-elif st.session_state.loss_trade >= 3:
-    estado_trade = "Ha perdido"
-
 # ---------------- INFO ----------------
 st.markdown(f"""
 <div class='info'><b>Capital inicial:</b> {formato_numero(st.session_state.capital_ini)}</div>
 <div class='info'><b>Saldo actual:</b> {formato_numero(st.session_state.capital)}</div>
 <div class='info'><b>Próxima inversión:</b> {formato_porcentaje(porc)} → {formato_numero(monto)}</div>
-<div class='info'><b>{estado_trade}</b></div>
 <div class='info'><b>Nivel:</b> {nivel}</div>
 """, unsafe_allow_html=True)
 
@@ -224,7 +191,6 @@ loss = c2.button("Loss")
 
 # ---------------- WIN ----------------
 if win:
-    estado_trade = "Ha ganado"
     st.session_state.capital += retorno
     st.session_state.loss_trade = 0
 
@@ -239,9 +205,11 @@ if win:
     st.session_state.contador += 1
     st.session_state.hist.insert(0, {
         "N°": st.session_state.contador,
+        "Fecha": fecha(),
+        "Nivel": nivel,
         "Resultado": "Win",
         "Inversión": formato_numero(monto),
-        "Retorno": f"<span class='text-retorno-win'>{formato_numero(retorno)}</span>",
+        "Retorno": f"<span class='text-win'>{formato_numero(retorno)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
     })
     st.rerun()
@@ -263,9 +231,11 @@ if loss:
     st.session_state.contador += 1
     st.session_state.hist.insert(0, {
         "N°": st.session_state.contador,
+        "Fecha": fecha(),
+        "Nivel": nivel,
         "Resultado": "Loss",
         "Inversión": formato_numero(monto),
-        "Retorno": f"<span class='text-retorno-loss'>-{formato_numero(monto)}</span>",
+        "Retorno": f"<span class='text-loss'>-{formato_numero(monto)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
     })
     st.rerun()
@@ -312,7 +282,6 @@ if st.session_state.hist:
     html += "</tbody></table>"
     st.markdown(html, unsafe_allow_html=True)
 else:
-
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
 
 
