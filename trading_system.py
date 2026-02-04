@@ -38,7 +38,7 @@ th, td {
 
 .bold { font-weight: bold; }
 
-/* -------- SCROLL HORIZONTAL MÓVIL -------- */
+/* -------- SCROLL HORIZONTAL -------- */
 .table-container {
     width: 100%;
     overflow-x: auto;
@@ -58,7 +58,7 @@ td, th, .info {
     min-width: fit-content;
 }
 
-/* -------- BOTONES UNIFICADOS -------- */
+/* -------- BOTONES -------- */
 .stButton > button {
     font-size: 15px;
     font-weight: 500;
@@ -68,36 +68,11 @@ td, th, .info {
     border: 1.5px solid #cfcfcf;
     background-color: #ffffff;
     color: #333333;
-    outline: none !important;
-    box-shadow: none !important;
     transition: all 0.15s ease-in-out;
 }
 
-/* Hover sutil */
 .stButton > button:hover {
     background-color: #f3f3f3;
-}
-
-/* WIN */
-.win-btn button,
-.win-btn button:hover,
-.win-btn button:active,
-.win-btn button:focus,
-.win-btn button:focus-visible {
-    background-color: #ffffff !important;
-    color: #333333 !important;
-    border: 1.5px solid #cfcfcf !important;
-}
-
-/* LOSS */
-.loss-btn button,
-.loss-btn button:hover,
-.loss-btn button:active,
-.loss-btn button:focus,
-.loss-btn button:focus-visible {
-    background-color: #ffffff !important;
-    color: #333333 !important;
-    border: 1.5px solid #cfcfcf !important;
 }
 
 /* -------- CAJA VACÍA -------- */
@@ -127,19 +102,15 @@ def formato_porcentaje(v):
     return f"{str(v).replace('.', ',')}%"
 
 def fecha():
-    dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
     meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
              "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
     f = datetime.now()
-
-    dia_semana = dias[f.weekday()]
-    mes = meses[f.month - 1]
-
     hora = f.strftime("%I:%M").lstrip("0")
     ampm = "a. m." if f.hour < 12 else "p. m."
 
-    return f"{dia_semana}, {f.day} de {mes} - {hora} {ampm}"
+    return f"{dias[f.weekday()]}, {f.day} de {meses[f.month-1]} - {hora} {ampm}"
 
 # ---------------- CONFIG SISTEMA ----------------
 PORCENTAJES = {
@@ -149,33 +120,9 @@ PORCENTAJES = {
     4: [4, 8.5, 18.05],
 }
 
+OBJETIVOS_REC = {2: 5, 3: 9, 4: 13}
 PAGO_BROKER = 0.89
 HIST_FILE = "historial.csv"
-
-if "init" not in st.session_state:
-    st.session_state.update({
-        "init": False,
-        "capital": 0,
-        "capital_ini": 0,
-        "loss_trade": 0,
-        "loss_consec": 0,
-        "wins_rec": 0,
-        "en_recuperacion": False,
-        "capital_freeze": None,
-        "hist": [],
-        "contador": 0
-    })
-
-if os.path.exists(HIST_FILE) and not st.session_state.hist:
-    df = pd.read_csv(HIST_FILE)
-    st.session_state.hist = df.to_dict("records")
-    st.session_state.contador = len(st.session_state.hist)
-
-OBJETIVOS_REC = {
-    2: 5,
-    3: 9,
-    4: 13,
-}
 
 # ---------------- ESTADO ----------------
 if "init" not in st.session_state:
@@ -191,6 +138,12 @@ if "init" not in st.session_state:
         "hist": [],
         "contador": 0
     })
+
+# Cargar histórico guardado
+if os.path.exists(HIST_FILE) and not st.session_state.hist:
+    df = pd.read_csv(HIST_FILE)
+    st.session_state.hist = df.to_dict("records")
+    st.session_state.contador = len(st.session_state.hist)
 
 # ---------------- HEADER ----------------
 st.title("Sistema de Gestión de Inversión")
@@ -210,12 +163,7 @@ if not st.session_state.init:
 nivel = min(4, st.session_state.loss_consec // 3 + 1)
 
 # ---------------- CÁLCULO ----------------
-base = (
-    st.session_state.capital_freeze
-    if st.session_state.en_recuperacion
-    else st.session_state.capital
-)
-
+base = st.session_state.capital_freeze if st.session_state.en_recuperacion else st.session_state.capital
 porc = PORCENTAJES[nivel][st.session_state.loss_trade]
 monto = base * porc / 100
 retorno = monto * PAGO_BROKER
@@ -264,7 +212,7 @@ if win:
     })
     pd.DataFrame(st.session_state.hist).to_csv(HIST_FILE, index=False)
     st.rerun()
-    
+
 # ---------------- LOSS ----------------
 if loss:
     if not st.session_state.en_recuperacion:
@@ -292,31 +240,27 @@ if loss:
     pd.DataFrame(st.session_state.hist).to_csv(HIST_FILE, index=False)
     st.rerun()
 
-# ---------------- HISTORICO + BORRAR ----------------
+# ---------------- HISTÓRICO ----------------
 h1, h2 = st.columns([10,1])
 h1.subheader("Histórico")
 
 if h2.button("Borrar"):
     cap = st.session_state.capital_ini
-    
     if os.path.exists(HIST_FILE):
-    os.remove(HIST_FILE)
+        os.remove(HIST_FILE)
+
     st.session_state.clear()
     st.session_state.update({
-    "init": True,
-    "capital": cap,
-    "capital_ini": cap,
-    "entrada": 0,
-    "loss_trade": 0,
-    "loss_consec": 0,
-    "hist": [],
-    "freeze": None,
-    "objetivo_rec": None,
-    "contador": 0,
-    "en_recuperacion": False,
-    "capital_freeze": None,
-    "wins_rec": 0,
-    "intentos_rec": 0
+        "init": True,
+        "capital": cap,
+        "capital_ini": cap,
+        "loss_trade": 0,
+        "loss_consec": 0,
+        "hist": [],
+        "contador": 0,
+        "en_recuperacion": False,
+        "capital_freeze": None,
+        "wins_rec": 0
     })
     st.rerun()
 
