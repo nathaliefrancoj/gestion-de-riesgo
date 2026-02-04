@@ -75,22 +75,11 @@ td, th, .info {
     text-overflow: ellipsis;
 }
 
-/* -------- MODO MÓVIL -------- */
+/* Evita que Streamlit rompa columnas en móvil */
 @media (max-width: 768px) {
-
-    .desktop-only {
-        display: none !important;
-    }
-
-    .mobile-buttons {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-start;
-        margin-bottom: 10px;
-    }
-
-    .mobile-buttons button {
-        min-width: 90px;
+    [data-testid="column"] {
+        flex: 0 0 auto !important;
+        width: auto !important;
     }
 }
 
@@ -229,22 +218,11 @@ if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
     )
 
 # ---------------- BOTONES ----------------
-# ----- DESKTOP -----
-st.markdown("<div class='desktop-only'>", unsafe_allow_html=True)
+st.markdown("<div class='button-row'>", unsafe_allow_html=True)
 c1, c2, _ = st.columns([1,1,10])
 win = c1.button("Win")
 loss = c2.button("Loss")
 st.markdown("</div>", unsafe_allow_html=True)
-
-# ----- MÓVIL -----
-st.markdown("<div class='mobile-buttons'>", unsafe_allow_html=True)
-win_m = st.button("Win", key="win_mobile")
-loss_m = st.button("Loss", key="loss_mobile")
-st.markdown("</div>", unsafe_allow_html=True)
-
-# Unificamos lógica
-win = win or win_m
-loss = loss or loss_m
 
 # ---------------- WIN ----------------
 if win:
@@ -300,18 +278,11 @@ if loss:
     st.rerun()
 
 # ---------------- HISTÓRICO ----------------
-# ----- DESKTOP -----
-st.markdown("<div class='desktop-only'>", unsafe_allow_html=True)
+st.markdown("<div class='button-row'>", unsafe_allow_html=True)
 h1, h2 = st.columns([10,1])
 h1.subheader("Histórico")
 borrar = h2.button("Borrar")
 st.markdown("</div>", unsafe_allow_html=True)
-
-# ----- MÓVIL -----
-st.subheader("Histórico")
-borrar_m = st.button("Borrar", key="borrar_mobile")
-
-borrar = borrar or borrar_m
 
 if borrar:
     cap = st.session_state.capital_ini
