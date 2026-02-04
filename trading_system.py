@@ -59,6 +59,30 @@ td, th, .info {
     min-width: fit-content;
 }
 
+/* -------- FIX BOTONES MÓVIL -------- */
+.button-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Botones fijos */
+.stButton > button {
+    min-width: 90px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Evita que Streamlit rompa columnas en móvil */
+@media (max-width: 768px) {
+    [data-testid="column"] {
+        flex: 0 0 auto !important;
+        width: auto !important;
+    }
+}
+
 /* -------- BOTONES -------- */
 .stButton > button {
     font-size: 15px;
@@ -194,9 +218,11 @@ if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
     )
 
 # ---------------- BOTONES ----------------
-c1, c2, _ = st.columns([1,1,10])
+st.markdown("<div class='button-row'>", unsafe_allow_html=True)
+c1, c2 = st.columns([1,1,10])
 win = c1.button("Win")
 loss = c2.button("Loss")
+st.markdown("</div>", unsafe_allow_html=True)
 
 # ---------------- WIN ----------------
 if win:
@@ -252,10 +278,13 @@ if loss:
     st.rerun()
 
 # ---------------- HISTÓRICO ----------------
+st.markdown("<div class='button-row'>", unsafe_allow_html=True)
 h1, h2 = st.columns([10,1])
 h1.subheader("Histórico")
+borrar = h2.button("Borrar")
+st.markdown("</div>", unsafe_allow_html=True)
 
-if h2.button("Borrar"):
+if borrar:
     cap = st.session_state.capital_ini
     if os.path.exists(HIST_FILE):
         os.remove(HIST_FILE)
