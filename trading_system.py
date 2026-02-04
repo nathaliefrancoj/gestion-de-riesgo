@@ -44,6 +44,11 @@ th, td {
     font-weight: bold;
 }
 
+.text-win,
+.text-loss {
+    border-radius: 6px;
+}
+
 .bold { font-weight: bold; }
 
 /* -------- BOTONES UNIFICADOS -------- */
@@ -289,6 +294,7 @@ if st.session_state.hist:
 else:
 
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
+
 
 
 
