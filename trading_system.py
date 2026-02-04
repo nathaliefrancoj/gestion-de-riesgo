@@ -227,10 +227,10 @@ loss_preview = ""
 if st.session_state.loss_trade + 1 < len(PORCENTAJES[nivel]):
     next_porc = PORCENTAJES[nivel][st.session_state.loss_trade + 1]
     next_monto = base * next_porc / 100
-    loss_preview = f"""
-    &nbsp;|&nbsp;
-    <span class='text-loss'><b>Loss → {formato_numero(next_monto)}</b></span>
-    """
+    loss_preview = (
+    "&nbsp;|&nbsp;"
+    f"<span class='text-loss'><b>Loss → {formato_numero(next_monto)}</b></span>"
+)
 
 # ---------------- INFO ----------------
 loss_preview = ""
