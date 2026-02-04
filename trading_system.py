@@ -102,7 +102,7 @@ def formato_porcentaje(v):
     return f"{str(v).replace('.', ',')}%"
 
 def fecha():
-    dias = ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo"]
+    dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
     meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
              "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
 
