@@ -49,6 +49,16 @@ th, td {
     border-radius: 6px;
 }
 
+.text-retorno-win {
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+.text-retorno-loss {
+    color: #c62828;
+    font-weight: bold;
+}
+
 .bold { font-weight: bold; }
 
 /* -------- BOTONES UNIFICADOS -------- */
@@ -221,7 +231,7 @@ if win:
         "N°": st.session_state.contador,
         "Resultado": "Win",
         "Inversión": formato_numero(monto),
-        "Retorno": f"<span class='text-win'>{formato_numero(retorno)}</span>",
+        "Retorno": f"<span class='text-retorno-win'>{formato_numero(retorno)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
     })
     st.rerun()
@@ -245,7 +255,7 @@ if loss:
         "N°": st.session_state.contador,
         "Resultado": "Loss",
         "Inversión": formato_numero(monto),
-        "Retorno": f"<span class='text-loss'>-{formato_numero(monto)}</span>",
+        "Retorno": f"<span class='text-retorno-loss'>-{formato_numero(monto)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
     })
     st.rerun()
@@ -294,6 +304,7 @@ if st.session_state.hist:
 else:
 
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
+
 
 
 
