@@ -232,20 +232,20 @@ monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
 # Capital inicial y saldo actual
-st.markdown(f"<div class='info'>Capital inicial: <b>{formato_numero(st.session_state.capital_ini)}</b></div>", unsafe_allow_html=True)
-st.markdown(f"<div class='info'>Saldo actual: <b>{formato_numero(st.session_state.capital)}</b></div>", unsafe_allow_html=True)
+st.markdown(f"<div class='info'><b>Capital inicial:</b> {formato_numero(st.session_state.capital_ini)}</div>", unsafe_allow_html=True)
+st.markdown(f"<div class='info'><b>Saldo actual:</b> {formato_numero(st.session_state.capital)}</div>", unsafe_allow_html=True)
 
 # Próxima inversión
-st.markdown(f"<div class='info'>Próxima inversión: <b>{formato_numero(monto)}</b></div>", unsafe_allow_html=True)
+st.markdown(f"<div class='info'><b>Próxima inversión:</b> {formato_numero(monto)}</div>", unsafe_allow_html=True)
 
 # Preparar recuperación: usa el siguiente porcentaje si existe
 if idx + 1 < len(PORCENTAJES[nivel]):
     next_porc = PORCENTAJES[nivel][idx + 1]
     next_monto = base * next_porc / 100
-    st.markdown(f"<div class='info'>Preparar recuperación: <b>{formato_numero(next_monto)}</b></div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='info'><b>Preparar recuperación:</b> {formato_numero(next_monto)}</div>", unsafe_allow_html=True)
 
 # Nivel
-st.markdown(f"<div class='info'>Nivel: <b>{nivel}</b></div>", unsafe_allow_html=True)
+st.markdown(f"<div class='info'><b>Nivel:</b> {nivel}</div>", unsafe_allow_html=True)
 
 # ---------------- BOTONES ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
