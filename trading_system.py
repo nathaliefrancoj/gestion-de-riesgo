@@ -238,16 +238,16 @@ st.markdown(f"<div class='info'><b>Saldo actual:</b> {formato_numero(st.session_
 # Próxima inversión
 st.markdown(f"<div class='info'><b>Próxima inversión:</b> {formato_numero(monto)}</div>", unsafe_allow_html=True)
 
-# Preparar recuperación
+# Apalancamientos
 if idx + 1 < len(PORCENTAJES[nivel]):
     next_porc = PORCENTAJES[nivel][idx + 1]
     next_monto = base * next_porc / 100
-    st.markdown(f"<div class='info'><b>Preparar recuperación:</b> {formato_numero(next_monto)}</div>", unsafe_allow_html=True)
+    if idx == 0:
+        st.markdown(f"<div class='info'><b>1er apalancamiento:</b> {formato_numero(next_monto)}</div>", unsafe_allow_html=True)
+    elif idx == 1:
+        st.markdown(f"<div class='info'><b>2do apalancamiento:</b> {formato_numero(next_monto)}</div>", unsafe_allow_html=True)
 else:
-    st.markdown(f"<div class='info'><b>Preparar recuperación:</b> No hay más recuperaciones.</div>", unsafe_allow_html=True)
-
-# Nivel
-st.markdown(f"<div class='info'><b>Nivel:</b> {nivel}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='info'><b>¡Último intento!</b></div>", unsafe_allow_html=True)
 
 # Recuperación: solo si está en recuperación y hay un objetivo definido
 if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
@@ -255,6 +255,10 @@ if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
         f"<div class='info'><b>Recuperación:</b> {st.session_state.wins_rec}/{OBJETIVOS_REC[nivel]} win</div>",
         unsafe_allow_html=True
     )
+
+# Nivel al final
+st.markdown(f"<div class='info'><b>Nivel:</b> {nivel}</div>", unsafe_allow_html=True)
+
 # ---------------- BOTONES ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
 c1, c2, _ = st.columns([1,1,10])
