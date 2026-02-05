@@ -243,6 +243,26 @@ porc_loss = PORCENTAJES[nivel_loss][idx_loss]
 monto_loss = base * porc_loss / 100
 
 # Mostrar Win y Loss
+
+# ---------------- PRÓXIMA INVERSIÓN ----------------
+# Base actual según recuperación
+base = st.session_state.capital_freeze if st.session_state.en_recuperacion else st.session_state.capital
+
+# Win: porcentaje actual dentro del nivel
+idx_win = min(st.session_state.loss_trade, len(PORCENTAJES[nivel]) - 1)
+porc_win = PORCENTAJES[nivel][idx_win]
+monto_win = base * porc_win / 100
+
+# Loss: siguiente nivel si aplica
+nivel_loss = nivel
+idx_loss = st.session_state.loss_trade + 1
+if idx_loss >= len(PORCENTAJES[nivel]):  # si se pasa del límite, sube de nivel
+    nivel_loss = min(nivel + 1, 4)  # máximo nivel 4
+    idx_loss = 0
+porc_loss = PORCENTAJES[nivel_loss][idx_loss]
+monto_loss = base * porc_loss / 100
+
+# Mostrar Win y Loss
 st.markdown(f"""
 <div class='info'>
 <b>Próxima inversión:</b>
