@@ -247,6 +247,13 @@ if idx + 1 < len(PORCENTAJES[nivel]):
 # Nivel
 st.markdown(f"<div class='info'><b>Nivel:</b> {nivel}</div>", unsafe_allow_html=True)
 
+# Recuperación: solo si está en recuperación y hay un objetivo definido
+if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
+    st.markdown(
+        f"<div class='info'>Recuperación: <b>{st.session_state.wins_rec}/{OBJETIVOS_REC[nivel]}</b> win</div>",
+        unsafe_allow_html=True
+    )
+
 # ---------------- BOTONES ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
 c1, c2, _ = st.columns([1,1,10])
