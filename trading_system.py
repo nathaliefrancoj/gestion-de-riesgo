@@ -211,8 +211,12 @@ if not st.session_state.init:
     # Usuario ya tiene historial: no pedimos capital
     if hist_guardado and st.session_state.hist:
         # Cargar capital actual desde última operación
-        st.session_state.capital_ini = st.session_state.hist[-1]['Saldo']
-        st.session_state.capital = st.session_state.capital_ini
+        ultimo_saldo_str = st.session_state.hist[-1]['Saldo']
+        # Convertir string "$1.234,56" a float 1234.56
+        saldo_num = float(ultimo_saldo_str.replace("$","").replace(".","").replace(",","."))
+        
+        st.session_state.capital_ini = saldo_num
+        st.session_state.capital = saldo_num
         st.session_state.init = True
     else:
         # Usuario nuevo o historial borrado: pedimos capital inicial
