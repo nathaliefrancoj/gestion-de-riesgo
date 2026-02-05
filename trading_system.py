@@ -349,16 +349,14 @@ h1.subheader("Histórico")
 borrar = h2.button("Borrar")
 st.markdown("</div>", unsafe_allow_html=True)
 
-# ---------------- ACCIÓN BORRAR ----------------
 if borrar:
-    # Mantener solo el capital inicial ingresado por el usuario
+    # Mantener saldo inicial ingresado
     cap_ini = st.session_state.capital_ini
-    
     # Borrar archivo histórico si existe
     if os.path.exists(HIST_FILE):
         os.remove(HIST_FILE)
 
-    # Limpiar todo el estado excepto el capital inicial
+    # Limpiar solo el histórico, mantener saldo inicial
     st.session_state['hist'] = []
     st.session_state['contador'] = 0
     st.session_state['capital'] = cap_ini
@@ -367,6 +365,4 @@ if borrar:
     st.session_state['wins_rec'] = 0
     st.session_state['en_recuperacion'] = False
     st.session_state['capital_freeze'] = None
-    st.session_state['init'] = False  # para que vuelva a pedir capital inicial
-    st.session_state['nivel_anterior'] = 1  # reinicia nivel
     st.rerun()
