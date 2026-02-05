@@ -231,9 +231,8 @@ porc = PORCENTAJES[nivel][idx]
 monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
-# Capital inicial y saldo actual
-st.markdown(f"<div class='info'><b>Capital inicial:</b> {formato_numero(st.session_state.capital_ini)}</div>", unsafe_allow_html=True)
-st.markdown(f"<div class='info'><b>Saldo actual:</b> {formato_numero(st.session_state.capital)}</div>", unsafe_allow_html=True)
+# Capital (combina capital inicial y saldo actual)
+st.markdown(f"<div class='info'><b>Capital:</b> {formato_numero(st.session_state.capital)}</div>", unsafe_allow_html=True)
 
 # Próxima inversión
 st.markdown(f"<div class='info'><b>Próxima inversión:</b> {formato_numero(monto)}</div>", unsafe_allow_html=True)
@@ -252,7 +251,7 @@ else:
 # Nivel con progreso de recuperación integrado
 if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
     st.markdown(
-        f"<div class='info'><b>Nivel:</b> {nivel} -> {st.session_state.wins_rec}/{OBJETIVOS_REC[nivel]} win</div>",
+        f"<div class='info'><b>Nivel:</b> {nivel} → {st.session_state.wins_rec}/{OBJETIVOS_REC[nivel]} win</div>",
         unsafe_allow_html=True
     )
 else:
