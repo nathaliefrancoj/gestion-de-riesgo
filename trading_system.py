@@ -214,7 +214,17 @@ if not st.session_state.init:
     st.stop()
 
 # ---------------- NIVEL ----------------
-nivel = min(4, st.session_state.loss_consec // 3 + 1)
+nuevo_nivel = min(4, st.session_state.loss_consec // 3 + 1)
+
+# Reiniciar wins de recuperación si se sube de nivel
+if "nivel_anterior" not in st.session_state:
+    st.session_state.nivel_anterior = nuevo_nivel
+
+if nuevo_nivel != st.session_state.nivel_anterior:
+    st.session_state.wins_rec = 0  # reinicia progreso de recuperación
+    st.session_state.nivel_anterior = nuevo_nivel
+
+nivel = nuevo_nivel
 
 # ---------------- CÁLCULO ----------------
 base = st.session_state.capital_freeze if st.session_state.en_recuperacion else st.session_state.capital
@@ -231,8 +241,8 @@ porc = PORCENTAJES[nivel][idx]
 monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
-# Capital (combina capital inicial y saldo actual)
-st.markdown(f"<div class='info'><b>Capital:</b> {formato_numero(st.session_state.capital)}</div>", unsafe_allow_html=True)
+# Capital: inicial → actual
+st.markdown(f"<div class='info'><b>Capital:</b> {formato_numero(st.session_state.capital_ini)} → {formato_numero(st.session_state.capital)}</div>", unsafe_allow_html=True)
 
 # Próxima inversión
 st.markdown(f"<div class='info'><b>Próxima inversión:</b> {formato_numero(monto)}</div>", unsafe_allow_html=True)
