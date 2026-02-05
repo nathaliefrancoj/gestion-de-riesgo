@@ -228,7 +228,6 @@ retorno = monto * PAGO_BROKER
 st.markdown(f"""
 <div class='info'><b>Capital inicial:</b> {formato_numero(st.session_state.capital_ini)}</div>
 <div class='info'><b>Saldo actual:</b> {formato_numero(st.session_state.capital)}</div>
-<div class='info'><b>Nivel:</b> {nivel}</div>
 """, unsafe_allow_html=True)
 
 # ---------------- PRÓXIMA INVERSIÓN ----------------
@@ -257,6 +256,9 @@ st.markdown(f"""
  | <span class='text-loss'><b>Loss → {formato_numero(monto_loss)}</b></span>
 </div>
 """, unsafe_allow_html=True)
+
+# Mostrar Nivel debajo de Próxima inversión
+st.markdown(f"<div class='info'><b>Nivel:</b> {nivel}</div>", unsafe_allow_html=True)
 
 # Mostrar recuperación si aplica
 if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
