@@ -244,17 +244,17 @@ retorno = monto * PAGO_BROKER
 # Capital: inicial → actual
 st.markdown(f"<div class='info'><b>Capital:</b> {formato_numero(st.session_state.capital_ini)} → {formato_numero(st.session_state.capital)}</div>", unsafe_allow_html=True)
 
-# Próxima inversión
-st.markdown(f"<div class='info'><b>Próxima inversión:</b> {formato_numero(monto)}</div>", unsafe_allow_html=True)
+# Inversión actual
+st.markdown(f"<div class='info'><b>Inversión actual:</b> {formato_numero(monto)}</div>", unsafe_allow_html=True)
 
-# Apalancamientos
+## Recuperaciones
 if idx + 1 < len(PORCENTAJES[nivel]):
     next_porc = PORCENTAJES[nivel][idx + 1]
     next_monto = base * next_porc / 100
     if idx == 0:
-        st.markdown(f"<div class='info'><b>1er apalancamiento:</b> {formato_numero(next_monto)}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='info'><b>1ra recuperación:</b> {formato_numero(next_monto)}</div>", unsafe_allow_html=True)
     elif idx == 1:
-        st.markdown(f"<div class='info'><b>2do apalancamiento:</b> {formato_numero(next_monto)}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='info'><b>2da recuperación:</b> {formato_numero(next_monto)}</div>", unsafe_allow_html=True)
 else:
     st.markdown(f"<div class='info'><b>¡Último intento!</b></div>", unsafe_allow_html=True)
 
