@@ -218,14 +218,15 @@ nivel = min(4, st.session_state.loss_consec // 3 + 1)
 
 # ---------------- CÁLCULO ----------------
 base = st.session_state.capital_freeze if st.session_state.en_recuperacion else st.session_state.capital
-porc = PORCENTAJES[nivel][st.session_state.loss_trade]
+idx = min(st.session_state.loss_trade, len(PORCENTAJES[nivel]) - 1)
+porc = PORCENTAJES[nivel][idx]
 monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
 # ---------------- INFO ----------------
 loss_preview = ""
-if st.session_state.loss_trade + 1 < len(PORCENTAJES[nivel]):
-    next_porc = PORCENTAJES[nivel][st.session_state.loss_trade + 1]
+if idx + 1 < len(PORCENTAJES[nivel]):
+    next_porc = PORCENTAJES[nivel][idx + 1]
     next_monto = base * next_porc / 100
     loss_preview = f" | <span class='text-loss'><b>Loss → {formato_numero(next_monto)}</b></span>"
 
