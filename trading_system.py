@@ -342,7 +342,6 @@ if loss:
     pd.DataFrame(st.session_state.hist).to_csv(HIST_FILE, index=False)
     st.rerun()
 
-# ---------------- HISTÓRICO ----------------
 # ---------------- BOTONES HISTORIAL ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
 h1, h2 = st.columns([10,1])
@@ -350,14 +349,16 @@ h1.subheader("Histórico")
 borrar = h2.button("Borrar")
 st.markdown("</div>", unsafe_allow_html=True)
 
+# ---------------- ACCIÓN BORRAR ----------------
 if borrar:
-    # Mantener saldo inicial ingresado
+    # Mantener solo el capital inicial ingresado por el usuario
     cap_ini = st.session_state.capital_ini
+    
     # Borrar archivo histórico si existe
     if os.path.exists(HIST_FILE):
         os.remove(HIST_FILE)
 
-    # Limpiar solo el histórico, mantener saldo inicial
+    # Limpiar todo el estado excepto el capital inicial
     st.session_state['hist'] = []
     st.session_state['contador'] = 0
     st.session_state['capital'] = cap_ini
@@ -366,23 +367,6 @@ if borrar:
     st.session_state['wins_rec'] = 0
     st.session_state['en_recuperacion'] = False
     st.session_state['capital_freeze'] = None
+    st.session_state['init'] = False  # para que vuelva a pedir capital inicial
+    st.session_state['nivel_anterior'] = 1  # reinicia nivel
     st.rerun()
-
-if st.session_state.hist:
-    df = pd.DataFrame(st.session_state.hist)
-    html = "<table><thead><tr class='header-row'>" + "".join(f"<th>{c}</th>" for c in df.columns) + "</tr></thead><tbody>"
-    for _, r in df.iterrows():
-        html += "<tr>"
-        for c, v in r.items():
-            if c == "Resultado":
-                cls = "text-win" if v == "Win" else "text-loss"
-                html += f"<td class='{cls}'>{v}</td>"
-            elif c == "N°":
-                html += f"<td class='bold'>{v}</td>"
-            else:
-                html += f"<td>{v}</td>"
-        html += "</tr>"
-    html += "</tbody></table>"
-    st.markdown(f"<div class='table-container'>{html}</div>", unsafe_allow_html=True)
-else:
-    st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
