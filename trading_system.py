@@ -204,14 +204,25 @@ st.title("Sistema de Gestión de Inversión")
 st.markdown("<div class='subtitle'>Creado por Nathalie Franco Jiménez</div>", unsafe_allow_html=True)
 
 # ---------------- CAPITAL ----------------
+# Verifica si hay historial guardado
+hist_guardado = os.path.exists(HIST_FILE)
+
 if not st.session_state.init:
-    cap = st.number_input("Capital inicial ($)", min_value=1, step=1, value=1)
-    if st.button("Iniciar"):
-        st.session_state.capital = cap
-        st.session_state.capital_ini = cap
+    # Usuario ya tiene historial: no pedimos capital
+    if hist_guardado and st.session_state.hist:
+        # Cargar capital actual desde última operación
+        st.session_state.capital_ini = st.session_state.hist[-1]['Saldo']
+        st.session_state.capital = st.session_state.capital_ini
         st.session_state.init = True
-        st.rerun()
-    st.stop()
+    else:
+        # Usuario nuevo o historial borrado: pedimos capital inicial
+        cap = st.number_input("Capital inicial ($)", min_value=1, step=1, value=1)
+        if st.button("Iniciar"):
+            st.session_state.capital = cap
+            st.session_state.capital_ini = cap
+            st.session_state.init = True
+            st.rerun()
+        st.stop()
 
 # ---------------- NIVEL ----------------
 nuevo_nivel = min(4, st.session_state.loss_consec // 3 + 1)
