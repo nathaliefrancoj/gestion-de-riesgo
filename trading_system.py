@@ -224,48 +224,29 @@ monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
 # ---------------- INFO ----------------
-# Mostrar Capital inicial y Saldo actual
-st.markdown(f"""
-<div class='info'><b>Capital inicial:</b> {formato_numero(st.session_state.capital_ini)}</div>
-<div class='info'><b>Saldo actual:</b> {formato_numero(st.session_state.capital)}</div>
-""", unsafe_allow_html=True)
-
-# ---------------- PRÓXIMA INVERSIÓN ----------------
-# Base actual según recuperación
+# Cálculo base
 base = st.session_state.capital_freeze if st.session_state.en_recuperacion else st.session_state.capital
+idx = min(st.session_state.loss_trade, len(PORCENTAJES[nivel]) - 1)
+porc = PORCENTAJES[nivel][idx]
+monto = base * porc / 100
+retorno = monto * PAGO_BROKER
 
-# Win: porcentaje actual dentro del nivel
-idx_win = min(st.session_state.loss_trade, len(PORCENTAJES[nivel]) - 1)
-porc_win = PORCENTAJES[nivel][idx_win]
-monto_win = base * porc_win / 100
+# Próxima inversión
+st.markdown(f"<div class='info'>Próxima inversión: {formato_numero(monto)}</div>", unsafe_allow_html=True)
 
-# Loss: siguiente nivel si aplica
-nivel_loss = nivel
-idx_loss = st.session_state.loss_trade + 1
-if idx_loss >= len(PORCENTAJES[nivel]):  # si se pasa del límite, sube de nivel
-    nivel_loss = min(nivel + 1, 4)  # máximo nivel 4
-    idx_loss = 0
-porc_loss = PORCENTAJES[nivel_loss][idx_loss]
-monto_loss = base * porc_loss / 100
+# Preparar recuperación: usa el siguiente porcentaje si existe
+if idx + 1 < len(PORCENTAJES[nivel]):
+    next_porc = PORCENTAJES[nivel][idx + 1]
+    next_monto = base * next_porc / 100
+    st.markdown(f"<div class='info'>Preparar recuperación: {formato_numero(next_monto)}</div>", unsafe_allow_html=True)
 
-# Mostrar Win y Loss
-st.markdown(f"""
-<div class='info'>
-<b>Próxima inversión:</b>
-<span class='text-win'><b>Win → {formato_numero(monto_win)}</b></span>
- | <span class='text-loss'><b>Loss → {formato_numero(monto_loss)}</b></span>
-</div>
-""", unsafe_allow_html=True)
+# Próxima recuperación: monto del "win" actual
+st.markdown(f"<div class='info'>Próxima recuperación: {formato_numero(retorno)}</div>", unsafe_allow_html=True)
 
-# Mostrar Nivel debajo de Próxima inversión
-st.markdown(f"<div class='info'><b>Nivel:</b> {nivel}</div>", unsafe_allow_html=True)
-
-# Mostrar recuperación si aplica
-if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
-    st.markdown(
-        f"<div class='info'><b>Recuperación:</b> {st.session_state.wins_rec}/{OBJETIVOS_REC[nivel]} win</div>",
-        unsafe_allow_html=True
-    )
+# Capital y nivel
+st.markdown(f"<div class='info'>Capital inicial: {formato_numero(st.session_state.capital_ini)}</div>", unsafe_allow_html=True)
+st.markdown(f"<div class='info'>Saldo actual: {formato_numero(st.session_state.capital)}</div>", unsafe_allow_html=True)
+st.markdown(f"<div class='info'>Nivel: {nivel}</div>", unsafe_allow_html=True)
 
 # ---------------- BOTONES ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
@@ -328,6 +309,7 @@ if loss:
     st.rerun()
 
 # ---------------- HISTÓRICO ----------------
+# ---------------- BOTONES HISTORIAL ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
 h1, h2 = st.columns([10,1])
 h1.subheader("Histórico")
@@ -335,23 +317,21 @@ borrar = h2.button("Borrar")
 st.markdown("</div>", unsafe_allow_html=True)
 
 if borrar:
-    cap = st.session_state.capital_ini
+    # Mantener saldo inicial ingresado
+    cap_ini = st.session_state.capital_ini
+    # Borrar archivo histórico si existe
     if os.path.exists(HIST_FILE):
         os.remove(HIST_FILE)
 
-    st.session_state.clear()
-    st.session_state.update({
-        "init": True,
-        "capital": cap,
-        "capital_ini": cap,
-        "loss_trade": 0,
-        "loss_consec": 0,
-        "hist": [],
-        "contador": 0,
-        "en_recuperacion": False,
-        "capital_freeze": None,
-        "wins_rec": 0
-    })
+    # Limpiar solo el histórico, mantener saldo inicial
+    st.session_state['hist'] = []
+    st.session_state['contador'] = 0
+    st.session_state['capital'] = cap_ini
+    st.session_state['loss_trade'] = 0
+    st.session_state['loss_consec'] = 0
+    st.session_state['wins_rec'] = 0
+    st.session_state['en_recuperacion'] = False
+    st.session_state['capital_freeze'] = None
     st.rerun()
 
 if st.session_state.hist:
