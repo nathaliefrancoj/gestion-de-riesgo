@@ -342,29 +342,29 @@ if loss:
     pd.DataFrame(st.session_state.hist).to_csv(HIST_FILE, index=False)
     st.rerun()
 
-# ---------------- HISTORICO + BORRAR ----------------
+# ---------------- BOTONES HISTORIAL ----------------
+st.markdown("<div class='button-row'>", unsafe_allow_html=True)
 h1, h2 = st.columns([10,1])
 h1.subheader("Histórico")
+borrar = h2.button("Borrar")
+st.markdown("</div>", unsafe_allow_html=True)
 
-if h2.button("Borrar"):
-    cap = st.session_state.capital_ini
-    st.session_state.clear()
-    st.session_state.update({
-    "init": True,
-    "capital": cap,
-    "capital_ini": cap,
-    "entrada": 0,
-    "loss_trade": 0,
-    "loss_consec": 0,
-    "hist": [],
-    "freeze": None,
-    "objetivo_rec": None,
-    "contador": 0,
-    "en_recuperacion": False,
-    "capital_freeze": None,
-    "wins_rec": 0,
-    "intentos_rec": 0
-    })
+if borrar:
+    # Mantener saldo inicial ingresado
+    cap_ini = st.session_state.capital_ini
+    # Borrar archivo histórico si existe
+    if os.path.exists(HIST_FILE):
+        os.remove(HIST_FILE)
+
+    # Limpiar solo el histórico, mantener saldo inicial
+    st.session_state['hist'] = []
+    st.session_state['contador'] = 0
+    st.session_state['capital'] = cap_ini
+    st.session_state['loss_trade'] = 0
+    st.session_state['loss_consec'] = 0
+    st.session_state['wins_rec'] = 0
+    st.session_state['en_recuperacion'] = False
+    st.session_state['capital_freeze'] = None
     st.rerun()
 
 if st.session_state.hist:
