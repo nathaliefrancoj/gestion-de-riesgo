@@ -249,15 +249,14 @@ if idx + 1 < len(PORCENTAJES[nivel]):
 else:
     st.markdown(f"<div class='info'><b>¡Último intento!</b></div>", unsafe_allow_html=True)
 
-# Recuperación: solo si está en recuperación y hay un objetivo definido
+# Nivel con progreso de recuperación integrado
 if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
     st.markdown(
-        f"<div class='info'><b>Recuperación:</b> {st.session_state.wins_rec}/{OBJETIVOS_REC[nivel]} win</div>",
+        f"<div class='info'><b>Nivel:</b> {nivel} -> {st.session_state.wins_rec}/{OBJETIVOS_REC[nivel]} win</div>",
         unsafe_allow_html=True
     )
-
-# Nivel al final
-st.markdown(f"<div class='info'><b>Nivel:</b> {nivel}</div>", unsafe_allow_html=True)
+else:
+    st.markdown(f"<div class='info'><b>Nivel:</b> {nivel}</div>", unsafe_allow_html=True)
 
 # ---------------- BOTONES ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
