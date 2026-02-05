@@ -224,25 +224,12 @@ monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
 # ---------------- INFO ----------------
-# ---------------- PRÓXIMA INVERSIÓN ----------------
-# Base actual según recuperación
-base = st.session_state.capital_freeze if st.session_state.en_recuperacion else st.session_state.capital
-
-# Win: porcentaje actual dentro del nivel
-idx_win = min(st.session_state.loss_trade, len(PORCENTAJES[nivel]) - 1)
-porc_win = PORCENTAJES[nivel][idx_win]
-monto_win = base * porc_win / 100
-
-# Loss: siguiente nivel si aplica
-nivel_loss = nivel
-idx_loss = st.session_state.loss_trade + 1
-if idx_loss >= len(PORCENTAJES[nivel]):  # si se pasa del límite, sube de nivel
-    nivel_loss = min(nivel + 1, 4)  # máximo nivel 4
-    idx_loss = 0
-porc_loss = PORCENTAJES[nivel_loss][idx_loss]
-monto_loss = base * porc_loss / 100
-
-# Mostrar Win y Loss
+# Mostrar Capital inicial y Saldo actual
+st.markdown(f"""
+<div class='info'><b>Capital inicial:</b> {formato_numero(st.session_state.capital_ini)}</div>
+<div class='info'><b>Saldo actual:</b> {formato_numero(st.session_state.capital)}</div>
+<div class='info'><b>Nivel:</b> {nivel}</div>
+""", unsafe_allow_html=True)
 
 # ---------------- PRÓXIMA INVERSIÓN ----------------
 # Base actual según recuperación
@@ -270,6 +257,13 @@ st.markdown(f"""
  | <span class='text-loss'><b>Loss → {formato_numero(monto_loss)}</b></span>
 </div>
 """, unsafe_allow_html=True)
+
+# Mostrar recuperación si aplica
+if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
+    st.markdown(
+        f"<div class='info'><b>Recuperación:</b> {st.session_state.wins_rec}/{OBJETIVOS_REC[nivel]} win</div>",
+        unsafe_allow_html=True
+    )
 
 # ---------------- BOTONES ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
