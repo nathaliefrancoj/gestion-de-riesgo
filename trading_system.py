@@ -528,26 +528,3 @@ if st.session_state.hist:
 
 else:
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
-
-    for _, r in df.iterrows():
-        html += "<tr>"
-        for c, v in r.items():
-
-            # 4) Resultado con fondo y letras negras
-            if c == "Resultado":
-                cls = "result-win" if v == "Win" else "result-loss"
-                html += f"<td class='{cls}'>{v}</td>"
-
-            elif c == "N°":
-                html += f"<td class='bold'>{v}</td>"
-
-            else:
-                html += f"<td>{v}</td>"
-
-        html += "</tr>"
-
-    html += "</tbody></table>"
-    st.markdown(html, unsafe_allow_html=True)
-
-else:
-    st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
