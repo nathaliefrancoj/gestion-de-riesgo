@@ -39,7 +39,7 @@ th, td {
    4) RESULTADO CON FONDO Y TEXTO NEGRO
    ============================== */
 .result-win {
-    background-color: #2e7d32;
+    background-color: #93c47d;
     color: #000;
     font-weight: bold;
 }
