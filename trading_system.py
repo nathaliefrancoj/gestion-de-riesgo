@@ -11,35 +11,29 @@ st.set_page_config(page_title="Sistema de Gestión de Inversión", layout="wide"
 st.markdown("""
 <style>
 
-html, body { font-family: serif; }
+/* ==============================
+   1) FORZAR MODO CLARO SIEMPRE
+   ============================== */
+html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
+    background-color: #f4f4f2 !important;
+    color: #111 !important;
+}
+[data-testid="stHeader"], [data-testid="stToolbar"] {
+    background: transparent !important;
+}
+
+html, body { font-family: serif; background-color: #ffffff; }
 
 h1 { text-align: center; }
 .subtitle { text-align: center; font-size: 14px; color: #555; margin-top: -8px; }
 
 .info { font-size: 17px; margin-bottom: 6px; }
 
-/* ==============================
-   HISTÓRICO: forzado en claro
-   SOLO dentro de la tabla-historico
-   ============================== */
-
-table.tabla-historico {
-    width: 100% !important;
+table {
+    width: 100%;
     border-collapse: collapse;
-    background-color: #f2f2f2 !important;
-    border: 1px solid #000 !important;
-}
-
-table.tabla-historico th,
-table.tabla-historico td {
-    background-color: #f2f2f2 !important;
-    color: #111 !important;
-    border: 1px solid #000 !important;
-}
-
-table.tabla-historico .header-row th {
-    background-color: #fff4cc !important;
-    color: #111 !important;
+    background-color: #f2f2f2;
+    border: 1px solid #000;
 }
 
 th, td {
@@ -499,18 +493,13 @@ if borrar:
 if st.session_state.hist:
     df = pd.DataFrame(st.session_state.hist)
 
-    # IMPORTANTE:
-    # - metemos la tabla dentro del contenedor (scroll horizontal)
-    # - le ponemos class="tabla-historico" para que el CSS SOLO afecte al histórico
-    html = "<div class='table-container'>"
-    html += "<table class='tabla-historico'>"
-    html += "<thead><tr class='header-row'>" + "".join(f"<th>{c}</th>" for c in df.columns) + "</tr></thead><tbody>"
+    html = "<table><thead><tr class='header-row'>" + "".join(f"<th>{c}</th>" for c in df.columns) + "</tr></thead><tbody>"
 
     for _, r in df.iterrows():
         html += "<tr>"
         for c, v in r.items():
 
-            # Resultado con fondo y letras negras
+            # 4) Resultado con fondo y letras negras
             if c == "Resultado":
                 cls = "result-win" if v == "Win" else "result-loss"
                 html += f"<td class='{cls}'>{v}</td>"
@@ -523,7 +512,7 @@ if st.session_state.hist:
 
         html += "</tr>"
 
-    html += "</tbody></table></div>"
+    html += "</tbody></table>"
     st.markdown(html, unsafe_allow_html=True)
 
 else:
