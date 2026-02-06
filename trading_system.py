@@ -11,17 +11,6 @@ st.set_page_config(page_title="Sistema de Gestión de Inversión", layout="wide"
 st.markdown("""
 <style>
 
-/* ==============================
-   1) FORZAR MODO CLARO SIEMPRE
-   ============================== */
-html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
-    background-color: #f4f4f2 !important;
-    color: #111 !important;
-}
-[data-testid="stHeader"], [data-testid="stToolbar"] {
-    background: transparent !important;
-}
-
 html, body { font-family: serif; }
 
 h1 { text-align: center; }
