@@ -15,14 +15,14 @@ st.markdown("""
    1) FORZAR MODO CLARO SIEMPRE
    ============================== */
 html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
-    background-color: #f4f4f2 !important;
+    background-color: #fffff !important;
     color: #111 !important;
 }
 [data-testid="stHeader"], [data-testid="stToolbar"] {
     background: transparent !important;
 }
 
-html, body { font-family: serif; background-color: #f4f4f2; }
+html, body { font-family: serif; background-color: #fffff; }
 
 h1 { text-align: center; }
 .subtitle { text-align: center; font-size: 14px; color: #555; margin-top: -8px; }
