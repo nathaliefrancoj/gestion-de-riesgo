@@ -22,7 +22,7 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
     background: transparent !important;
 }
 
-html, body { font-family: serif; background-color: #ffffff; }
+html, body { font-family: serif; background-color: #f4f4f2; }
 
 h1 { text-align: center; }
 .subtitle { text-align: center; font-size: 14px; color: #555; margin-top: -8px; }
