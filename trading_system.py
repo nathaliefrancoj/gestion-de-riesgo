@@ -24,7 +24,7 @@ h1 { text-align: center; }
    ============================== */
 
 table.tabla-historico {
-    width: 100%;
+    width: 100% !important;
     border-collapse: collapse;
     background-color: #f2f2f2 !important;
     border: 1px solid #000 !important;
@@ -34,7 +34,7 @@ table.tabla-historico th,
 table.tabla-historico td {
     background-color: #f2f2f2 !important;
     color: #111 !important;
-    border-color: #000 !important;
+    border: 1px solid #000 !important;
 }
 
 table.tabla-historico .header-row th {
@@ -499,7 +499,35 @@ if borrar:
 if st.session_state.hist:
     df = pd.DataFrame(st.session_state.hist)
 
-    html = "<table><thead><tr class='header-row'>" + "".join(f"<th>{c}</th>" for c in df.columns) + "</tr></thead><tbody>"
+    # IMPORTANTE:
+    # - metemos la tabla dentro del contenedor (scroll horizontal)
+    # - le ponemos class="tabla-historico" para que el CSS SOLO afecte al histórico
+    html = "<div class='table-container'>"
+    html += "<table class='tabla-historico'>"
+    html += "<thead><tr class='header-row'>" + "".join(f"<th>{c}</th>" for c in df.columns) + "</tr></thead><tbody>"
+
+    for _, r in df.iterrows():
+        html += "<tr>"
+        for c, v in r.items():
+
+            # Resultado con fondo y letras negras
+            if c == "Resultado":
+                cls = "result-win" if v == "Win" else "result-loss"
+                html += f"<td class='{cls}'>{v}</td>"
+
+            elif c == "N°":
+                html += f"<td class='bold'>{v}</td>"
+
+            else:
+                html += f"<td>{v}</td>"
+
+        html += "</tr>"
+
+    html += "</tbody></table></div>"
+    st.markdown(html, unsafe_allow_html=True)
+
+else:
+    st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
 
     for _, r in df.iterrows():
         html += "<tr>"
