@@ -22,7 +22,7 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
     background: transparent !important;
 }
 
-html, body { font-family: serif; background-color: #f4f4f2; }
+html, body { font-family: serif; }
 
 h1 { text-align: center; }
 .subtitle { text-align: center; font-size: 14px; color: #555; margin-top: -8px; }
@@ -34,6 +34,18 @@ table {
     border-collapse: collapse;
     background-color: #f2f2f2;
     border: 1px solid #000;
+}
+
+/* FORZAR TABLA HISTÓRICO EN CLARO (aunque el sistema esté oscuro) */
+table, th, td {
+    background-color: #f2f2f2 !important;
+    color: #111 !important;
+    border-color: #000 !important;
+}
+
+.header-row th {
+    background-color: #fff4cc !important;
+    color: #111 !important;
 }
 
 th, td {
