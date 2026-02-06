@@ -50,19 +50,19 @@ th, td {
    4) RESULTADO CON FONDO Y TEXTO NEGRO
    ============================== */
 .result-win {
-    background-color: #c8e6c9;
-    color: #111;
+    background-color: #93c47d;
+    color: #000;
     font-weight: bold;
 }
 .result-loss {
-    background-color: #ffcdd2;
-    color: #111;
+    background-color: #e06666;
+    color: #000;
     font-weight: bold;
 }
 
 /* Retorno sí puede seguir en verde/rojo */
-.text-win { color: #2e7d32; font-weight: bold; }
-.text-loss { color: #c62828; font-weight: bold; }
+.text-win { color: #93c47d; font-weight: bold; }
+.text-loss { color: #e06666; font-weight: bold; }
 
 .bold { font-weight: bold; }
 
