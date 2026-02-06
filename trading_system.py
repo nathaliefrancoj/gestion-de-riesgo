@@ -18,21 +18,30 @@ h1 { text-align: center; }
 
 .info { font-size: 17px; margin-bottom: 6px; }
 
+/* ==============================
+   TABLA HISTÓRICO (FIJA EN MODO OSCURO)
+   ============================== */
+
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #f2f2f2;
-    border: 1px solid #000;
+    background-color: #f2f2f2 !important;
+    border: 1px solid #000 !important;
+    color: #000 !important;
 }
 
+/* SOLO TEXTO (SIN BORDES) */
 th, td {
     text-align: center;
     padding: 10px;
+    color: #000 !important;
 }
 
+/* encabezado amarillo fijo */
 .header-row th {
-    background-color: #fff4cc;
+    background-color: #ffe599 !important;
     text-align: center;
+    color: #000 !important;
 }
 
 /* ==============================
