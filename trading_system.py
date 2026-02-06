@@ -10,12 +10,20 @@ st.set_page_config(page_title="Sistema de Gestión de Inversión", layout="wide"
 # ---------------- ESTILOS ----------------
 st.markdown("""
 <style>
-html, body { font-family: serif; background-color: #f4f4f2; }
+/* -------- FORZAR MODO CLARO SIEMPRE -------- */
+html, body, [data-testid="stAppViewContainer"], [data-testid="stApp"] {
+    background-color: #f4f4f2 !important;
+    color: #111 !important;
+}
 
-h1 { text-align: center; }
+[data-testid="stHeader"], [data-testid="stToolbar"] {
+    background: transparent !important;
+}
+
+h1 { text-align: center; color: #111 !important; }
 .subtitle { text-align: center; font-size: 14px; color: #555; margin-top: -8px; }
 
-.info { font-size: 17px; margin-bottom: 6px; }
+.info { font-size: 17px; margin-bottom: 6px; color: #111 !important; }
 
 table {
     width: 100%;
@@ -27,11 +35,25 @@ table {
 th, td {
     text-align: center;
     padding: 10px;
+    white-space: nowrap;
 }
 
 .header-row th {
     background-color: #fff4cc;
     text-align: center;
+}
+
+/* -------- RESULTADO CON FONDO Y TEXTO NEGRO -------- */
+.result-win {
+    background-color: #c8e6c9;
+    color: #111;
+    font-weight: bold;
+}
+
+.result-loss {
+    background-color: #ffcdd2;
+    color: #111;
+    font-weight: bold;
 }
 
 .text-win { color: #2e7d32; font-weight: bold; }
@@ -43,10 +65,6 @@ th, td {
 .table-container {
     width: 100%;
     overflow-x: auto;
-    white-space: nowrap;
-}
-
-td, th, .info {
     white-space: nowrap;
 }
 
@@ -121,11 +139,6 @@ def formato_numero(v):
         return f"${int(v)}"
     return f"${v:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
-def formato_porcentaje(v):
-    if float(v).is_integer():
-        return f"{int(v)}%"
-    return f"{str(v).replace('.', ',')}%"
-
 def fecha():
     tz = ZoneInfo("America/Bogota")
     f = datetime.now(tz)
@@ -138,6 +151,10 @@ def fecha():
     ampm = "a. m." if f.hour < 12 else "p. m."
 
     return f"{dias[f.weekday()]}, {f.day} de {meses[f.month-1]} - {hora} {ampm}"
+
+def parse_money(s):
+    # "$1.234,56" -> 1234.56
+    return float(str(s).replace("$", "").replace(".", "").replace(",", "."))
 
 # ---------------- CONFIG SISTEMA ----------------
 PORCENTAJES = {
@@ -167,8 +184,10 @@ if not st.session_state.usuario:
 
     st.stop()
 
-# ---------------- HISTORIAL POR USUARIO ----------------
+# ---------------- ARCHIVOS POR USUARIO ----------------
 HIST_FILE = f"historial_{st.session_state.usuario}.csv"
+STATE_FILE = f"estado_{st.session_state.usuario}.csv"
+CONFIG_FILE = f"config_{st.session_state.usuario}.csv"
 
 # ---------------- ESTADO ----------------
 if "init" not in st.session_state:
@@ -185,58 +204,74 @@ if "init" not in st.session_state:
         "contador": 0
     })
 
-# Garantiza que las claves críticas siempre existan
-st.session_state.setdefault("en_recuperacion", False)
-st.session_state.setdefault("capital_freeze", None)
-st.session_state.setdefault("loss_trade", 0)
-st.session_state.setdefault("loss_consec", 0)
-st.session_state.setdefault("wins_rec", 0)
-st.session_state.setdefault("capital", 0)
+# ---------------- CARGA DE CONFIG (capital inicial real) ----------------
+if os.path.exists(CONFIG_FILE):
+    df_conf = pd.read_csv(CONFIG_FILE)
+    if not df_conf.empty:
+        st.session_state.capital_ini = float(df_conf.loc[0, "capital_inicial"])
 
-# Cargar histórico guardado
+# ---------------- CARGA HISTORIAL ----------------
 if os.path.exists(HIST_FILE) and not st.session_state.hist:
     df = pd.read_csv(HIST_FILE)
     st.session_state.hist = df.to_dict("records")
     st.session_state.contador = len(st.session_state.hist)
 
+# ---------------- CARGA ESTADO COMPLETO ----------------
+if os.path.exists(STATE_FILE):
+    df_state = pd.read_csv(STATE_FILE)
+    if not df_state.empty:
+        st.session_state.capital = float(df_state.loc[0, "capital"])
+        st.session_state.loss_trade = int(df_state.loc[0, "loss_trade"])
+        st.session_state.loss_consec = int(df_state.loc[0, "loss_consec"])
+        st.session_state.wins_rec = int(df_state.loc[0, "wins_rec"])
+        st.session_state.en_recuperacion = bool(df_state.loc[0, "en_recuperacion"])
+        cf = df_state.loc[0, "capital_freeze"]
+        st.session_state.capital_freeze = None if pd.isna(cf) else float(cf)
+
 # ---------------- HEADER ----------------
 st.title("Sistema de Gestión de Inversión")
 st.markdown("<div class='subtitle'>Creado por Nathalie Franco Jiménez</div>", unsafe_allow_html=True)
 
-# ---------------- CAPITAL ----------------
-# Verifica si hay historial guardado
-hist_guardado = os.path.exists(HIST_FILE)
-
+# ---------------- INICIO CAPITAL ----------------
 if not st.session_state.init:
-    # Usuario ya tiene historial: no pedimos capital
-    if hist_guardado and st.session_state.hist:
-        # Cargar capital actual desde última operación
-        ultimo_saldo_str = st.session_state.hist[-1]['Saldo']
-        # Convertir string "$1.234,56" a float 1234.56
-        saldo_num = float(ultimo_saldo_str.replace("$","").replace(".","").replace(",","."))
-        
-        st.session_state.capital_ini = saldo_num
-        st.session_state.capital = saldo_num
+
+    # Si existe config y existe estado, ya iniciamos directo
+    if os.path.exists(CONFIG_FILE) and os.path.exists(STATE_FILE):
         st.session_state.init = True
+
     else:
-        # Usuario nuevo o historial borrado: pedimos capital inicial
         cap = st.number_input("Capital inicial ($)", min_value=1, step=1, value=1)
+
         if st.button("Iniciar"):
-            st.session_state.capital = cap
-            st.session_state.capital_ini = cap
+            st.session_state.capital_ini = float(cap)
+            st.session_state.capital = float(cap)
+
+            # Guardar config (capital inicial real)
+            pd.DataFrame([{"capital_inicial": st.session_state.capital_ini}]).to_csv(CONFIG_FILE, index=False)
+
+            # Guardar estado inicial
+            pd.DataFrame([{
+                "capital": st.session_state.capital,
+                "loss_trade": 0,
+                "loss_consec": 0,
+                "wins_rec": 0,
+                "en_recuperacion": False,
+                "capital_freeze": ""
+            }]).to_csv(STATE_FILE, index=False)
+
             st.session_state.init = True
             st.rerun()
+
         st.stop()
 
 # ---------------- NIVEL ----------------
 nuevo_nivel = min(4, st.session_state.loss_consec // 3 + 1)
 
-# Reiniciar wins de recuperación si se sube de nivel
 if "nivel_anterior" not in st.session_state:
     st.session_state.nivel_anterior = nuevo_nivel
 
 if nuevo_nivel != st.session_state.nivel_anterior:
-    st.session_state.wins_rec = 0  # reinicia progreso de recuperación
+    st.session_state.wins_rec = 0
     st.session_state.nivel_anterior = nuevo_nivel
 
 nivel = nuevo_nivel
@@ -249,20 +284,13 @@ monto = base * porc / 100
 retorno = monto * PAGO_BROKER
 
 # ---------------- INFO ----------------
-# Cálculo base
-base = st.session_state.capital_freeze if st.session_state.en_recuperacion else st.session_state.capital
-idx = min(st.session_state.loss_trade, len(PORCENTAJES[nivel]) - 1)
-porc = PORCENTAJES[nivel][idx]
-monto = base * porc / 100
-retorno = monto * PAGO_BROKER
+st.markdown(
+    f"<div class='info'><b>Capital:</b> {formato_numero(st.session_state.capital_ini)} → {formato_numero(st.session_state.capital)}</div>",
+    unsafe_allow_html=True
+)
 
-# Capital: inicial → actual
-st.markdown(f"<div class='info'><b>Capital:</b> {formato_numero(st.session_state.capital_ini)} → {formato_numero(st.session_state.capital)}</div>", unsafe_allow_html=True)
-
-# Inversión actual
 st.markdown(f"<div class='info'><b>Inversión actual:</b> {formato_numero(monto)}</div>", unsafe_allow_html=True)
 
-## Recuperaciones
 if idx + 1 < len(PORCENTAJES[nivel]):
     next_porc = PORCENTAJES[nivel][idx + 1]
     next_monto = base * next_porc / 100
@@ -273,7 +301,6 @@ if idx + 1 < len(PORCENTAJES[nivel]):
 else:
     st.markdown(f"<div class='info'><b>¡Último intento!</b></div>", unsafe_allow_html=True)
 
-# Nivel con progreso de recuperación integrado
 if st.session_state.en_recuperacion and nivel in OBJETIVOS_REC:
     st.markdown(
         f"<div class='info'><b>Nivel:</b> {nivel} → {st.session_state.wins_rec}/{OBJETIVOS_REC[nivel]} win</div>",
@@ -284,10 +311,20 @@ else:
 
 # ---------------- BOTONES ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
-c1, c2, _ = st.columns([1,1,10])
+c1, c2, _ = st.columns([1, 1, 10])
 win = c1.button("Win")
 loss = c2.button("Loss")
 st.markdown("</div>", unsafe_allow_html=True)
+
+def guardar_estado():
+    pd.DataFrame([{
+        "capital": st.session_state.capital,
+        "loss_trade": st.session_state.loss_trade,
+        "loss_consec": st.session_state.loss_consec,
+        "wins_rec": st.session_state.wins_rec,
+        "en_recuperacion": st.session_state.en_recuperacion,
+        "capital_freeze": "" if st.session_state.capital_freeze is None else st.session_state.capital_freeze
+    }]).to_csv(STATE_FILE, index=False)
 
 # ---------------- WIN ----------------
 if win:
@@ -312,7 +349,9 @@ if win:
         "Retorno": f"<span class='text-win'>{formato_numero(retorno)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
     })
+
     pd.DataFrame(st.session_state.hist).to_csv(HIST_FILE, index=False)
+    guardar_estado()
     st.rerun()
 
 # ---------------- LOSS ----------------
@@ -339,49 +378,78 @@ if loss:
         "Retorno": f"<span class='text-loss'>-{formato_numero(monto)}</span>",
         "Saldo": formato_numero(st.session_state.capital)
     })
+
     pd.DataFrame(st.session_state.hist).to_csv(HIST_FILE, index=False)
+    guardar_estado()
     st.rerun()
 
 # ---------------- BOTONES HISTORIAL ----------------
 st.markdown("<div class='button-row'>", unsafe_allow_html=True)
-h1, h2 = st.columns([10,1])
+h1, h2, h3 = st.columns([10, 1, 1])
 h1.subheader("Histórico")
-borrar = h2.button("Borrar")
+inicio = h2.button("Inicio")
+borrar = h3.button("Borrar")
 st.markdown("</div>", unsafe_allow_html=True)
 
+# -------- INICIO: BORRA TODO Y VUELVE A LOGIN --------
+if inicio:
+    for f in [HIST_FILE, STATE_FILE, CONFIG_FILE]:
+        if os.path.exists(f):
+            os.remove(f)
+
+    # Reinicio total
+    st.session_state.usuario = ""
+    st.session_state.init = False
+    st.session_state.hist = []
+    st.session_state.contador = 0
+    st.session_state.capital = 0
+    st.session_state.capital_ini = 0
+    st.session_state.loss_trade = 0
+    st.session_state.loss_consec = 0
+    st.session_state.wins_rec = 0
+    st.session_state.en_recuperacion = False
+    st.session_state.capital_freeze = None
+    st.rerun()
+
+# -------- BORRAR: SOLO BORRA HISTORIAL Y REINICIA AL CAPITAL INICIAL REAL --------
 if borrar:
-    # Mantener saldo inicial ingresado
-    cap_ini = st.session_state.capital_ini
-    # Borrar archivo histórico si existe
     if os.path.exists(HIST_FILE):
         os.remove(HIST_FILE)
 
-    # Limpiar solo el histórico, mantener saldo inicial
-    st.session_state['hist'] = []
-    st.session_state['contador'] = 0
-    st.session_state['capital'] = cap_ini
-    st.session_state['loss_trade'] = 0
-    st.session_state['loss_consec'] = 0
-    st.session_state['wins_rec'] = 0
-    st.session_state['en_recuperacion'] = False
-    st.session_state['capital_freeze'] = None
+    st.session_state.hist = []
+    st.session_state.contador = 0
+
+    # Reinicia al capital inicial REAL (guardado en CONFIG_FILE)
+    st.session_state.capital = st.session_state.capital_ini
+    st.session_state.loss_trade = 0
+    st.session_state.loss_consec = 0
+    st.session_state.wins_rec = 0
+    st.session_state.en_recuperacion = False
+    st.session_state.capital_freeze = None
+
+    guardar_estado()
     st.rerun()
 
+# ---------------- TABLA ----------------
 if st.session_state.hist:
     df = pd.DataFrame(st.session_state.hist)
-    html = "<table><thead><tr class='header-row'>" + "".join(f"<th>{c}</th>" for c in df.columns) + "</tr></thead><tbody>"
+
+    html = "<div class='table-container'>"
+    html += "<table><thead><tr class='header-row'>" + "".join(f"<th>{c}</th>" for c in df.columns) + "</tr></thead><tbody>"
+
     for _, r in df.iterrows():
         html += "<tr>"
         for c, v in r.items():
             if c == "Resultado":
-                cls = "text-win" if v == "Win" else "text-loss"
+                cls = "result-win" if v == "Win" else "result-loss"
                 html += f"<td class='{cls}'>{v}</td>"
             elif c == "N°":
                 html += f"<td class='bold'>{v}</td>"
             else:
                 html += f"<td>{v}</td>"
         html += "</tr>"
-    html += "</tbody></table>"
+
+    html += "</tbody></table></div>"
     st.markdown(html, unsafe_allow_html=True)
 else:
     st.markdown("<div class='empty-box'>Aún no hay operaciones registradas</div>", unsafe_allow_html=True)
